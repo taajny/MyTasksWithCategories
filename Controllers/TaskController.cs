@@ -9,6 +9,8 @@ using MyTasks.Persistence.Extensions;
 using MyTasks.Persistence;
 using MyTasks.Persistence.Services;
 using MyTasks.Core.Service;
+using MyTasksWithCategories.Persistence.Repositories;
+using MyTasks.Core;
 
 namespace MyTasks.Controllers
 {

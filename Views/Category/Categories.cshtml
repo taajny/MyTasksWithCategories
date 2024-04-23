@@ -1,0 +1,84 @@
+﻿@model MyTasksWithCategories.Core.ViewModels.CategoryViewModel;
+@{
+    ViewData["Title"] = "Kategorie użytkownika";
+}
+<h1 class="mb-3">Kategorie użytkownika</h1>
+
+<button 
+        class="btn btn-primary mb-3" 
+        onclick='window.location.href="@Url.Action("Category", "Category")"'>
+            Dodaj kategorię
+</button>
+
+<div id="categoriesTable">
+    <table class="table mt-3 table-bordered">
+        <thead class="thead-dark">
+            <tr>
+                <th scope="col">Nazwa</th>
+                <th scope="col"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (Model.Categories != null && Model.Categories.Any())
+            {
+                foreach (var category in Model.Categories)
+                {
+                    <tr>
+                        <td>
+                            <a href="@Url.Action("Category", "Category", new { id = category.Id })" class="font-weight-bold">
+                                @category.Name
+                            </a>
+                        </td>
+                        
+                        <td>
+                            <button class="btn btn-danger btn-sm" onclick="deleteCategory('@category.Id', this)">
+                                Usuń
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td class="text-center" colspan="2">
+                        Brak zdefiniowanych kategorii dla aktualnego użytkownika.
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section Scripts
+    {
+    <script type="text/javascript">
+
+        function deleteCategory(id, btn) {
+
+            if (!confirm("Czy na pewno chcesz usunąć tą kategorię?"))
+                return;
+
+            $.ajax({
+                type: "POST",
+                url: "@Url.Action("Delete", "Category")",
+                data: {
+                    id: id
+                },
+                success: function (data) {
+                    if (data.success) {
+                        var row = btn.parentNode.parentNode;
+                        row.parentNode.removeChild(row);
+                    } else {
+                        alert(data.message);
+                    }
+                },
+                error: function (data) {
+                    alert(data.message)
+                },
+                dataType: "json"
+            });
+
+        }
+
+    </script>
+}
