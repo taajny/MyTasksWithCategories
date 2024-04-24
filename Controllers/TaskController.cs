@@ -18,15 +18,23 @@ namespace MyTasks.Controllers
     public class TaskController : Controller
     {
         private ITaskService _taskService;
-        public TaskController(ITaskService taskService) 
+        private CategoryRepository _categoryRepository;
+        public TaskController(ITaskService taskService, ApplicationDbContext context) 
         {
             _taskService = taskService;
+            _categoryRepository = new CategoryRepository(context);
         }
         public IActionResult Tasks()
         {
               
             var userId = User.GetUserId();
+            var categories = _categoryRepository.GetCategories(userId);
 
+            if (categories == null || !categories.Any())
+            {
+                _categoryRepository.AddCategory("Ogólna", userId);
+            }
+            
             var vm = new TasksViewModel
             {
                 FilterTasks = new FilterTasks(),

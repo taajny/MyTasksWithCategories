@@ -4,6 +4,7 @@ namespace MyTasksWithCategories.Core.ViewModels
 {
     public class CategoryViewModel
     {
-        public IEnumerable<Category> Categories { get; set; }
+        public Category Category { get; set; }
+        public string Heading { get; set; }
     }
 }

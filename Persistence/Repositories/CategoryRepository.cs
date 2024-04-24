@@ -20,6 +20,11 @@ namespace MyTasksWithCategories.Persistence.Repositories
             return _context.Categories.Where(x => x.UserId == userId).ToList();
         }
 
+        public Category Get(int id, string userId) 
+        { 
+            return _context.Categories.Single(x => x.Id == id && x.UserId == userId);
+        }
+
         public void AddCategory(string name, string userId)
         { 
             Category category = new Category { Name = name, UserId = userId, Tasks = new Collection<Task>() };
@@ -34,6 +39,17 @@ namespace MyTasksWithCategories.Persistence.Repositories
             _context.Categories.Remove(CategoryToDelete);
             _context.SaveChanges();
 
+        }
+
+        public void Update(Category category)
+        {
+            var categoryToUpdate = _context.Categories.Single(x => x.Id == category.Id);
+
+            categoryToUpdate.Name = category.Name;
+            categoryToUpdate.UserId = category.UserId;
+            
+            _context.Categories.Update(categoryToUpdate);
+            _context.SaveChanges();
         }
     }
 }
