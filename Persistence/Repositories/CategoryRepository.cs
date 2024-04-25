@@ -4,13 +4,14 @@ using Task = MyTasks.Core.Models.Domains.Task;
 using MyTasks.Core.Models.Domains;
 using MyTasks.Persistence;
 using System.Collections.ObjectModel;
+using MyTasksWithCategories.Core.Repositories;
 
 namespace MyTasksWithCategories.Persistence.Repositories
 {
-    public class CategoryRepository
+    public class CategoryRepository : ICategoryRepository
     {
-        private ApplicationDbContext _context;
-        public CategoryRepository(ApplicationDbContext context)
+        private IApplicationDbContext _context;
+        public CategoryRepository(IApplicationDbContext context)
         {
             _context = context;
         }
@@ -19,7 +20,10 @@ namespace MyTasksWithCategories.Persistence.Repositories
         {
             return _context.Categories.Where(x => x.UserId == userId).ToList();
         }
-
+        public IEnumerable<Category> GetCategories()
+        {
+            return _context.Categories.OrderBy(x => x.Name).ToList();
+        }
         public Category Get(int id, string userId) 
         { 
             return _context.Categories.Single(x => x.Id == id && x.UserId == userId);
@@ -29,7 +33,6 @@ namespace MyTasksWithCategories.Persistence.Repositories
         { 
             Category category = new Category { Name = name, UserId = userId, Tasks = new Collection<Task>() };
             _context.Categories.Add(category);
-            _context.SaveChanges();
         }
 
         public void Delete(int id, string userId)
@@ -37,8 +40,6 @@ namespace MyTasksWithCategories.Persistence.Repositories
             var CategoryToDelete = _context.Categories.Single(x => x.Id == id && x.UserId == userId);
 
             _context.Categories.Remove(CategoryToDelete);
-            _context.SaveChanges();
-
         }
 
         public void Update(Category category)
@@ -49,7 +50,6 @@ namespace MyTasksWithCategories.Persistence.Repositories
             categoryToUpdate.UserId = category.UserId;
             
             _context.Categories.Update(categoryToUpdate);
-            _context.SaveChanges();
         }
     }
 }

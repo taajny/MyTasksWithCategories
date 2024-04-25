@@ -3,6 +3,7 @@ using MyTasks.Core.Models.Domains;
 using MyTasks.Core.ViewModels;
 using MyTasks.Persistence;
 using MyTasks.Persistence.Extensions;
+using MyTasksWithCategories.Core.Service;
 using MyTasksWithCategories.Core.ViewModels;
 using MyTasksWithCategories.Persistence.Repositories;
 using System.Threading.Tasks;
@@ -11,19 +12,19 @@ namespace MyTasksWithCategories.Controllers
 {
     public class CategoryController : Controller
     {
-        private CategoryRepository _categoryRepository;
-        public CategoryController(ApplicationDbContext context)
+        private ICategoryService _categoryService;
+        public CategoryController(ICategoryService categoryService)
         {
-            _categoryRepository = new CategoryRepository(context);
+            _categoryService = categoryService;
         }
         public IActionResult Categories()
         {
             var userId = User.GetUserId();
-            var categories = _categoryRepository.GetCategories(userId);
+            var categories = _categoryService.GetCategories(userId);
             
             if ( categories == null || !categories.Any())
             {
-                _categoryRepository.AddCategory("Ogólna", userId);
+                _categoryService.AddCategory("Ogólna", userId);
             }
 
             var vm = new CategoriesViewModel { Categories = categories };
@@ -37,7 +38,7 @@ namespace MyTasksWithCategories.Controllers
             
             var category = id == 0 ?
                 new Category { Id = 0, UserId = userId } :
-                _categoryRepository.Get(id, userId);
+                _categoryService.Get(id, userId);
 
             var vm = new CategoryViewModel
             {
@@ -68,11 +69,11 @@ namespace MyTasksWithCategories.Controllers
 
             if ( category.Id == 0)
             {
-                _categoryRepository.AddCategory(category.Name, userId);
+                _categoryService.AddCategory(category.Name, userId);
             }
             else
             {
-                _categoryRepository.Update(category);
+                _categoryService.Update(category);
             }
             return RedirectToAction("Categories");
         }
@@ -83,7 +84,7 @@ namespace MyTasksWithCategories.Controllers
             try
             {
                 var userId = User.GetUserId();
-                _categoryRepository.Delete(id, userId);
+                _categoryService.Delete(id, userId);
 
             }
             catch (Exception ex)

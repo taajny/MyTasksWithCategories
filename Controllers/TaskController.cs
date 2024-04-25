@@ -11,6 +11,7 @@ using MyTasks.Persistence.Services;
 using MyTasks.Core.Service;
 using MyTasksWithCategories.Persistence.Repositories;
 using MyTasks.Core;
+using MyTasksWithCategories.Core.Service;
 
 namespace MyTasks.Controllers
 {
@@ -18,28 +19,28 @@ namespace MyTasks.Controllers
     public class TaskController : Controller
     {
         private ITaskService _taskService;
-        private CategoryRepository _categoryRepository;
-        public TaskController(ITaskService taskService, ApplicationDbContext context) 
+        private ICategoryService _categoryService;
+        public TaskController(ITaskService taskService, ICategoryService categoryService) 
         {
             _taskService = taskService;
-            _categoryRepository = new CategoryRepository(context);
+            _categoryService = categoryService;
         }
         public IActionResult Tasks()
         {
               
             var userId = User.GetUserId();
-            var categories = _categoryRepository.GetCategories(userId);
+            var categories = _categoryService.GetCategories(userId);
 
             if (categories == null || !categories.Any())
             {
-                _categoryRepository.AddCategory("Ogólna", userId);
+                _categoryService.AddCategory("Ogólna", userId);
             }
             
             var vm = new TasksViewModel
             {
                 FilterTasks = new FilterTasks(),
                 Tasks = _taskService.Get(userId),
-                Categories = _taskService.GetCategories()
+                Categories = _categoryService.GetCategories()
             };
 
             return View(vm);
@@ -69,7 +70,7 @@ namespace MyTasks.Controllers
             {
                 Task = task,
                 Heading = id == 0 ? "Dodawanie nowego zadania" : "Edycja zadania",
-                Categories = _taskService.GetCategories()
+                Categories = _categoryService.GetCategories()
             };
 
             return View(vm);
@@ -88,7 +89,7 @@ namespace MyTasks.Controllers
                 {
                     Task = task,
                     Heading = task.Id == 0 ? "Dodawanie nowego zadania" : "Edycja zadania",
-                    Categories = _taskService.GetCategories()
+                    Categories = _categoryService.GetCategories()
                 };
 
                 return View("Task", vm);

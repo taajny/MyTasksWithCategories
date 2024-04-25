@@ -17,10 +17,10 @@ namespace MyTasks.Persistence.Services
         {
             return _unitOfWork.Task.Get(userId, isExecuted, categoryId, title);
         }
-        public IEnumerable<Category> GetCategories()
+        /*public IEnumerable<Category> GetCategories()
         {
             return _unitOfWork.Task.GetCategories();
-        }
+        }*/
 
         public Task Get(int id, string userId)
         {
